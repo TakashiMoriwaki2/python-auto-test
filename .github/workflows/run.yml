@@ -5,6 +5,7 @@ on:
     branches: [ "main" ] # コード保存時に自動実行
   schedule:
     - cron: '0 0 * * *' # 毎日日本時間 9:00 に自動実行
+  workflow_dispatch: # ★ここを追加（手動実行を可能にする）
 
 jobs:
   run-python:
