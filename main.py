@@ -36,6 +36,30 @@ for i in range(len(title_list)):
     shortTitle = title_list[i].getText()
     output_writer.writerow(['', title, 'シアタークリエ', first, last, linkTag , link])
 
+#新橋演舞場
+res = requests.get('https://www.shochiku.co.jp/play/schedules/?theater=enbujyo')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.text, 'html.parser')
+title_list = soup.select('.info .description')
+kikan_list = soup.select('.time')
+link_list = soup.select('.info a')
+link_list2 = []
+
+for j in range(len(link_list)):
+    if j%2 == 0:
+        link_list2.append(link_list[j])
+
+for i in range(len(title_list)):
+    title = title_list[i].getText()
+    link = link_list2[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    first = kikan_list[i].getText()
+    last = ""
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, '新橋演舞場', first, last, linkTag , link])
+
+
+
 output_file.close()
 print('スクレイピング完了')
 print('output.csvに保存完了')
