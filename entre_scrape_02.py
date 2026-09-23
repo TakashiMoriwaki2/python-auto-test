@@ -40,7 +40,9 @@ def clean_title(text):
 # 空文字を除外してクリーン化
 clean_entre_titles = [clean_title(t) for t in title_list if clean_title(t)]
 
-# 3. フィルタリング処理
+# --------------------------------------------------
+# 3. フィルタリング処理（原因調査用ログ付き）
+# --------------------------------------------------
 filtered_list = []
 
 for row in file1_list:
@@ -52,34 +54,43 @@ for row in file1_list:
     url_tag = row[5]
     official_url = row[6]
 
+    # 原因調査用：現在のタイトルを表示
+    print(f"【検証中】: {title}")
+
+    # 条件A: 日付未定
     if firstday == "＊＊＊＊＊":
+        print(" ➔ 削除：日付が＊＊＊＊＊です")
         continue
 
     clean_tg_title = clean_title(title)
     
-    # タイトル重複チェック（空文字を除外して厳密に判定）
+    # 条件B: タイトル重複チェック
     is_duplicate_title = False
     if clean_tg_title:
         for entre_t in clean_entre_titles:
-            # 互いに2文字以上で部分一致するか確認
-            if len(entre_t) >= 2 and (entre_t in clean_tg_title or clean_tg_title in entre_t):
+            # 短すぎる文字での誤検知を防ぐため、3文字以上に制限
+            if len(entre_t) >= 3 and (entre_t in clean_tg_title or clean_tg_title in entre_t):
                 is_duplicate_title = True
+                print(f" ➔ 削除：タイトル重複 (エントレ側のタイトル: {entre_t})")
                 break
 
     if is_duplicate_title:
         continue
 
-    # URL重複チェック
+    # 条件C: URL重複チェック
     is_duplicate_url = False
     for entre_link in link_list:
         if entre_link and len(entre_link) > 5:
             if entre_link in official_url or entre_link in url_tag:
                 is_duplicate_url = True
+                print(f" ➔ 削除：URL重複 (エントレ側のURL: {entre_link})")
                 break
 
     if is_duplicate_url:
         continue
 
+    # すべてクリアした場合のみ追加
+    print(" ➔ クリア：リストに残します")
     filtered_list.append(row)
 
 # 4. output_deleted.csv へ書き出し
