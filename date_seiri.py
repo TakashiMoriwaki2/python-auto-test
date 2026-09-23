@@ -5,12 +5,12 @@ from datetime import datetime
 # 現在の年（補完用）
 current_year = datetime.now().year
 
-# CSVファイルを読み込み
-df = pd.read_csv("output_deleted.csv")
+# CSVファイルを読み込み（すべて文字列型として読み込み、空欄の自動数値化を防止）
+df = pd.read_csv("output_deleted.csv", dtype=str, keep_default_na=False)
 
 # 不要な語・記号・括弧・空白を除去
 def clean_date_str(s):
-    if pd.isna(s):
+    if pd.isna(s) or s == "":
         return ""
     s = str(s)
 
@@ -69,7 +69,7 @@ def format_date(dt):
 
 # 期間表現を抽出（〜、－、- など）
 def extract_start_end(date_str):
-    if pd.isna(date_str):
+    if pd.isna(date_str) or date_str == "":
         return "", ""
 
     s = clean_date_str(date_str)
@@ -127,10 +127,12 @@ for d_raw, e_raw in zip(df.iloc[:, 3], df.iloc[:, 4]):
         new_d_dates.append(start_fmt)
         new_e_dates.append(end_fmt)
 
-# DataFrameに反映
+# DataFrameに反映（型エラー防止のため明示的にオブジェクト型へ変換）
+df.iloc[:, 3] = df.iloc[:, 3].astype(object)
+df.iloc[:, 4] = df.iloc[:, 4].astype(object)
+
 df.iloc[:, 3] = new_d_dates  # D列 = 開始日
 df.iloc[:, 4] = new_e_dates  # E列 = 終了日
-
 
 
 # 現在日付を取得（時刻を無視）
@@ -143,17 +145,15 @@ df_valid = df[(df.iloc[:, 3] != "") & (df.iloc[:, 4] != "")].copy()
 df_valid["終了日_date"] = pd.to_datetime(df_valid.iloc[:, 4], format="%Y/%m/%d", errors="coerce")
 
 # ③ 今日以降のみ残す
-today = datetime.now().date()
 df_final = df_valid[df_valid["終了日_date"] >= pd.Timestamp(today)].copy()
 
 # ④ 補助列を削除
 df_final = df_final.drop(columns=["終了日_date"])
 
-# 保存
-df_final.to_csv("output_deleted_date.csv", index=False)
+# 保存（文字化け防止のため utf-8-sig 指定）
+df_final.to_csv("output_deleted_date.csv", index=False, encoding="utf-8-sig")
 
 # レポート
 deleted_total = len(df) - len(df_final)
 print(f"✅ 終了日が空、または今日より前の行 {deleted_total} 件を削除しました。")
 print("📁 完成ファイル: output_deleted_date.csv")
-
