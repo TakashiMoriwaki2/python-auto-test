@@ -105,6 +105,17 @@ df_deduplicated.to_csv(csv_filename, index=False, encoding="utf-8-sig")
 print("✅ B列の重複を削除してCSVファイルに上書き保存しました。")
 
 
+
+# エントレの上演情報をスクレイピングして比較
+import entre_scrape_02
+
+print('output_deleted.csvに保存完了')
+
+# 日付を整理
+import date_seiri
+
+
+
 endTime = time.time() - startTime
 endTime = str(int(endTime)) + '秒で出来ました！'
 print(endTime)
