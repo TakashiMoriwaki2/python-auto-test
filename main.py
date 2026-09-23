@@ -99,8 +99,8 @@ df = pd.read_csv(csv_filename)
 # B列（インデックス1）で重複を削除（先頭だけ残す）
 df_deduplicated = df.drop_duplicates(subset=df.columns[1], keep="first")
 
-# 元のCSVファイルに上書き保存
-df_deduplicated.to_csv(csv_filename, index=False)
+# 元のCSVファイルに上書き保存（encoding="utf-8-sig" を追加）
+df_deduplicated.to_csv(csv_filename, index=False, encoding="utf-8-sig")
 
 print("✅ B列の重複を削除してCSVファイルに上書き保存しました。")
 
