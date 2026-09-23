@@ -25,8 +25,8 @@ jobs:
       - name: Pythonスクリプトの実行
         run: python main.py
         
-      - name: 生成されたCSVを保存
+      - name: 生成されたCSVをまとめて保存
         uses: actions/upload-artifact@v4
         with:
-          name: scraping-result
-          path: output.csv
+          name: scraping-results
+          path: '*.csv'
