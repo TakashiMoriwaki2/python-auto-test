@@ -20,7 +20,7 @@ jobs:
           
       # ★ここにライブラリインストールの手順を追加します
       - name: 必要なライブラリのインストール
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pandas
         
       - name: Pythonスクリプトの実行
         run: python main.py
