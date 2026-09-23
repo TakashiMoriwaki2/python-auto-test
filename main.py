@@ -15,11 +15,12 @@ output_writer = csv.writer(output_file)
 output_writer.writerow(['post_id', 'post_title', 'theaterName','firstday', 'lastday','URLtag', 'URL'])
 
 
-#帝国劇場
-res = requests.get('https://teigeki.tohostage.com/lineup/index.html')
+#シアタークリエ
+res = requests.get('https://crea.tohostage.com/lineup/index.html')
+res.raise_for_status()
 soup = bs4.BeautifulSoup(res.content, 'html.parser')
 title_list = soup.select('.lineup_content h3')
-kikan_list =soup.select('.lineup_content .date')
+kikan_list = soup.select('.date')
 link_list = soup.select('.poster a')
 
 for i in range(len(title_list)):
@@ -33,7 +34,8 @@ for i in range(len(title_list)):
         first = '＊＊＊＊＊'
         last = '＊＊＊＊＊'
     shortTitle = title_list[i].getText()
-    output_writer.writerow(['', title, '帝国劇場', first, last, linkTag , link])
+    output_writer.writerow(['', title, 'シアタークリエ', first, last, linkTag , link])
+
 
     
 
