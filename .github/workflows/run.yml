@@ -32,8 +32,16 @@ jobs:
           name: scraping-results
           path: '*.csv'
   
-      - name: WordPress APIのテスト実行
-        env:
-          WP_USER: ${{ secrets.WP_USER }}
-          WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
-        run: python test_wp.py
+      - name: CSVファイルをメールで送信
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_ADDRESS }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: 【自動送信】スクレイピング結果のCSVファイル
+          to: ${{ secrets.GMAIL_ADDRESS }} # 宛先（自分から自分へ送ります）
+          from: GitHub Actions
+          body: スクレイピングが完了しました。添付のCSVファイル（output_deleted_date.csv）を確認してください。
+          attachments: output_deleted_date.csv
