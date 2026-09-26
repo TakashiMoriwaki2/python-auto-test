@@ -31,3 +31,9 @@ jobs:
         with:
           name: scraping-results
           path: '*.csv'
+  
+      - name: WordPress APIのテスト実行
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
+        run: python test_wp.py
