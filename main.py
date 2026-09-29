@@ -59,6 +59,30 @@ for i in range(len(title_list)):
     output_writer.writerow(['', title, '新橋演舞場', first, last, linkTag , link])
 
 
+#東京建物ブリリアホール
+res = requests.get('https://toshima-theatre.jp/event/')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.text, 'html.parser')
+title_list = soup.select('h3')
+kikan_list = soup.select('.date')
+link_list = soup.select('h3 a')
+
+for i in range(len(title_list)):
+    title = title_list[i].getText().strip().replace("\n", "")
+    link = "https://toshima-theatre.jp" + link_list[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '～' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('～')[0]
+        last = kikan_list[i].getText().split('～')[1]
+    else:
+        first = '＊＊＊＊＊'
+        last = '＊＊＊＊＊'
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, '東京建物ブリリアホール', first, last, linkTag , link])
+
+
+
+
 
 output_file.close()
 print('スクレイピング完了')
