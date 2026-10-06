@@ -36,6 +36,28 @@ for i in range(len(title_list)):
     shortTitle = title_list[i].getText()
     output_writer.writerow(['', title, 'シアタークリエ', first, last, linkTag , link])
 
+#日生劇場
+res = requests.get('https://www.nissaytheatre.or.jp/schedule/')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.content, 'html.parser')
+title_list = soup.select('p.tit.min')
+kikan_list = soup.select('.opendate')
+link_list = soup.select('.btn-gold a')
+link_list2 = []
+for i in range(len(link_list)):
+    if "詳細はこちら" in link_list[i].getText():
+        link_list2.append(link_list[i])
+
+for i in range(len(kikan_list)):
+    title = title_list[i].getText()
+    link = link_list2[i].get('href')
+    first = kikan_list[i].getText().replace("・","～")
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, '日生劇場', first, "", linkTag , link])
+
+
+
 #新橋演舞場
 res = requests.get('https://www.shochiku.co.jp/play/schedules/?theater=enbujyo')
 res.raise_for_status()
