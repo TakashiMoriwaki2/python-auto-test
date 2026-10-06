@@ -80,6 +80,26 @@ for i in range(len(title_list)):
     shortTitle = title_list[i].getText()
     output_writer.writerow(['', title, '東京建物ブリリアホール', first, last, linkTag , link])
 
+#MILANO-Za
+res = requests.get('https://milano-za.jp/events/')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.content, 'html.parser')
+title_list = soup.select('.event-block .text-block h3')
+kikan_list =soup.select('.event-block .schedule')
+link_list = soup.select('.events-list .event-block a')
+
+for i in range(len(title_list)):
+    title = title_list[i].getText().strip().replace("\n", "")
+    link = "https://milano-za.jp/events/" + link_list[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '～' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('～')[0]
+        last = kikan_list[i].getText().split('～')[1]
+    else:
+        first = '＊＊＊＊＊'
+        last = '＊＊＊＊＊'
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, 'MILANO-Za', first, last, linkTag , link])
 
 
 
