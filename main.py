@@ -177,22 +177,36 @@ print("処理が完了しました。")
 import pandas as pd
 
 
-"""
-B列のタイトルが重複している行を削除
-"""
-# 対象のCSVファイル名
+# ==========================================
+# B列のタイトルが重複している行を削除 ＆ 除外リストで弾く
+# ==========================================
 csv_filename = "output.csv"  # ← ファイル名を適宜変更
 
 # CSVを読み込む
 df = pd.read_csv(csv_filename)
 
-# B列（インデックス1）で重複を削除（先頭だけ残す）
-df_deduplicated = df.drop_duplicates(subset=df.columns[1], keep="first")
+# 1. B列（インデックス1）で重複を削除（先頭だけ残す）
+df = df.drop_duplicates(subset=df.columns[1], keep="first")
+
+# 2. 除外リストを読み込んでフィルターをかける
+exclude_file = 'exclude_list.txt'
+if os.path.exists(exclude_file):
+    with open(exclude_file, 'r', encoding='utf-8') as f:
+        # 空行を省いてリスト化
+        exclude_words = [line.strip() for line in f if line.strip()]
+    
+    print("以下のキーワードを含む公演を除外します:", exclude_words)
+    
+    # 'post_title' 列に除外キーワードが含まれていない行だけを残す
+    for word in exclude_words:
+        df = df[~df['post_title'].str.contains(word, na=False, case=False)]
+else:
+    print(f"除外リスト({exclude_file})が見つかりません。除外処理をスキップします。")
 
 # 元のCSVファイルに上書き保存（encoding="utf-8-sig" を追加）
-df_deduplicated.to_csv(csv_filename, index=False, encoding="utf-8-sig")
+df.to_csv(csv_filename, index=False, encoding="utf-8-sig")
 
-print("✅ B列の重複を削除してCSVファイルに上書き保存しました。")
+print("✅ B列の重複削除と除外リストの適用が完了し、上書き保存しました。")
 
 
 
