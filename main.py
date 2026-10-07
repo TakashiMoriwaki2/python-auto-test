@@ -84,21 +84,29 @@ for i in range(len(title_list)):
 res = requests.get('https://stage.parco.jp/calendar/')
 res.raise_for_status()
 soup = bs4.BeautifulSoup(res.text, 'html.parser')
+
 title_list = soup.select('.mainCont__scheduleList__item__txt--ttl')
 kikan_list = soup.select('.mainCont__scheduleList__item__txt--date')
+place_list = soup.select('.mainCont__scheduleList__item__txt--place') # ← ① 劇場名のリストを取得
 link_list = soup.select('.box-in a')
+
 link_list2 = []
 for i in range(len(link_list)):
     if i%2 != 0:
         link_list2.append(link_list[i])
 
 for i in range(len(title_list)):
-    title = title_list[i].getText().strip()
-    first = kikan_list[i].getText()
-    link = '<a href="https://stage.parco.jp' + link_list2[i].get('href') + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
-    #末尾の数字とスラッシュを削除して作品ページのリンクにする
-    link2 = re.sub(r'\d+/$', '', link)
-    output_writer.writerow(['', title, 'PARCO劇場', first, '' ,link2, ''])
+    # ② i番目の劇場名を取得して、前後の改行や空白を取り除く
+    place = place_list[i].getText().strip()
+    
+    # ③ 劇場名に「PARCO劇場」が含まれる場合のみ、リスト（CSV）に入れる
+    if 'PARCO劇場' in place:
+        title = title_list[i].getText().strip()
+        first = kikan_list[i].getText()
+        link = '<a href="https://stage.parco.jp' + link_list2[i].get('href') + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+        #末尾の数字とスラッシュを削除して作品ページのリンクにする
+        link2 = re.sub(r'\d+/$', '', link)
+        output_writer.writerow(['', title, 'PARCO劇場', first, '' ,link2, ''])
 
 
 
