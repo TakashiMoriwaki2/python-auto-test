@@ -144,6 +144,41 @@ for i in range(len(title_list)):
     shortTitle = title_list[i].getText()
     output_writer.writerow(['', title, 'MILANO-Za', first, last, linkTag , link])
 
+#新国立劇場
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options # ←追加
+
+# --- GitHubの画面なしサーバーで動かすための設定 ---
+options = Options()
+options.add_argument('--headless')
+driver = webdriver.Firefox(options=options) # optionsを指定して起動
+# --------------------------------------------------
+
+url = 'https://www.nntt.jac.go.jp/performance/'
+driver.get(url)
+time.sleep(3)  #3秒待つ
+html = driver.page_source
+soup = BeautifulSoup(html, 'html.parser')
+title_list = soup.select('.pf_BoxListLead')
+kikan_list = soup.select('.pf_BoxListDays')
+link_list = soup.select('.pf_BoxListLink')
+
+for i in range(len(title_list)):
+    title = title_list[i].getText().strip().replace("\n", "")
+    link = "https://www.nntt.jac.go.jp" + str(link_list[i].get('href'))
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '～' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('～')[0]
+        last = kikan_list[i].getText().split('～')[1]
+    else:
+        first = '＊＊＊＊＊'
+        last = '＊＊＊＊＊'
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, '新国立劇場', first, last, linkTag , link])
+
+driver.quit()
+
 
 
 
