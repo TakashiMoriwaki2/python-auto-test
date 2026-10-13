@@ -205,6 +205,30 @@ for i in range(len(title_list)):
     output_writer.writerow(['', title, '新国立劇場', first, "", linkTag , link])
 
 
+#世田谷パブリックシアター
+res = requests.get('https://setagaya-pt.jp/performances')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.content, 'html.parser')
+title_list = soup.select('.performances-list-title')
+kikan_list = soup.select('.performances-list-period')
+link_list = soup.select('.performances-list-text a')
+place_list = soup.select('.label-setagaya')
+for i in range(len(title_list)):
+    title = title_list[i].getText().strip().replace("\n", "")
+    link = link_list[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '-' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('-')[0]
+        last = kikan_list[i].getText().split('-')[1]
+    else:
+        first = '＊＊＊＊＊'
+        last = '＊＊＊＊＊'
+    place = place_list[i].getText()
+    output_writer.writerow(['', title, place, first, last, linkTag , link])
+
+
+
+
 
 output_file.close()
 print('スクレイピング完了')
