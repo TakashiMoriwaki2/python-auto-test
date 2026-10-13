@@ -188,6 +188,22 @@ for i in range(len(title_list)):
 driver.quit()
 
 
+#新国立劇場 貸館
+res = requests.get('https://www.nntt.jac.go.jp/performance/rent/')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.content, 'html.parser')
+title_list = soup.select('.title')
+kikan_list = soup.select('.period')
+link_list = soup.select('.linkBtn02 a')
+outline_list = soup.select('.outline')
+for i in range(len(title_list)):
+    title = outline_list[i].getText() + " " +title_list[i].getText()
+    link = link_list[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    shortTitle = title_list[i].getText()
+    first = kikan_list[i].getText().replace("、","～")
+    output_writer.writerow(['', title, '新国立劇場', first, "", linkTag , link])
+
 
 
 output_file.close()
