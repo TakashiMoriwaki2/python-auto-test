@@ -205,26 +205,42 @@ for i in range(len(title_list)):
     output_writer.writerow(['', title, '新国立劇場', first, "", linkTag , link])
 
 
-#世田谷パブリックシアター
+
+# 世田谷パブリックシアター
 res = requests.get('https://setagaya-pt.jp/performances')
 res.raise_for_status()
 soup = bs4.BeautifulSoup(res.content, 'html.parser')
-title_list = soup.select('.performances-list-title')
-kikan_list = soup.select('.performances-list-period')
-link_list = soup.select('.performances-list-text a')
-place_list = soup.select('.label-setagaya')
-for i in range(len(title_list)):
-    title = title_list[i].getText().strip().replace("\n", "")
-    link = link_list[i].get('href')
-    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
-    if '-' in kikan_list[i].getText():
-        first = kikan_list[i].getText().split('-')[0]
-        last = kikan_list[i].getText().split('-')[1]
-    else:
-        first = '＊＊＊＊＊'
-        last = '＊＊＊＊＊'
-    place = place_list[i].getText()
-    output_writer.writerow(['', title, place, first, last, linkTag , link])
+
+# ① 各公演の「カード（親要素）」全体のリストを取得する
+# （※もし実際のHTMLのカードのクラス名が違っていれば教えてください）
+item_list = soup.select('.performances-list-item')
+
+for item in item_list:
+    # ② そのカード（ブロック）の中にあるそれぞれの要素を安全に取得する
+    title_elem = item.select_one('.performances-list-title')
+    kikan_elem = item.select_one('.performances-list-period')
+    link_elem = item.select_one('a.btn.btn-small.btn-next.btn-center-only-sp')
+    place_elem = item.select_one('.label-setagaya')
+    
+    # タイトルとリンクが両方存在する場合のみ処理する
+    if title_elem and link_elem:
+        title = title_elem.getText().strip().replace("\n", "")
+        link = link_elem.get('href')
+        linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+        
+        # 期間の処理
+        if kikan_elem and '-' in kikan_elem.getText():
+            first = kikan_elem.getText().split('-')[0].strip()
+            last = kikan_elem.getText().split('-')[1].strip()
+        else:
+            first = '＊＊＊＊＊'
+            last = '＊＊＊＊＊'
+            
+        # 場所の処理（要素がなければ空文字）
+        place = place_elem.getText().strip() if place_elem else ''
+        
+        output_writer.writerow(['', title, place, first, last, linkTag, link])
+
 
 
 
