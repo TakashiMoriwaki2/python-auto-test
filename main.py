@@ -242,7 +242,47 @@ for item in item_list:
         output_writer.writerow(['', title, place, first, last, linkTag, link])
 
 
+#シアターオーブ
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options # ←追加
 
+# --- GitHubの画面なしサーバーで動かすための設定 ---
+options = Options()
+options.add_argument('--headless')
+driver = webdriver.Firefox(options=options) # optionsを指定して起動
+# --------------------------------------------------
+
+#まずリンクを取得
+url = 'https://theatre-orb.com/lineup/'
+driver.get(url)
+time.sleep(3)  #3秒待つ
+html = driver.page_source
+soup = BeautifulSoup(html, 'html.parser')
+title_list = soup.select('.ttl')
+kikan_list = soup.select('.date')
+
+url = 'https://theatre-orb.com/'
+driver.get(url)
+time.sleep(3)  #3秒待つ
+html = driver.page_source
+soup = BeautifulSoup(html, 'html.parser')
+link_list = soup.select('.pic a')
+
+for i in range(len(title_list)):
+    title = title_list[i].getText().strip().replace("\n", "")
+    link = "https://theatre-orb.com" + link_list[i].get('href')
+    linkTag = '<a href="' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '～' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('～')[0]
+        last = kikan_list[i].getText().split('～')[1]
+    else:
+        first = '＊＊＊＊＊'
+        last = '＊＊＊＊＊'
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, 'シアターオーブ', first, last, linkTag , link])
+
+driver.quit()
 
 
 
