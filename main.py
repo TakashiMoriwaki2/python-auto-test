@@ -291,6 +291,33 @@ print('スクレイピング完了')
 print('output.csvに保存完了')
 
 
+#KAAT神奈川芸術劇場
+res = requests.get('https://www.kaat.jp/event/search')
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.content, 'html.parser')
+title_list = soup.select('.ttlIntro')
+kikan_list = soup.select('.listIntro')
+link_list = soup.select('.btnCommon01')
+link_list2 = []
+for i in range(len(link_list)):
+    if not "https://www.s2.e-get.jp" in link_list[i].get('href'):
+        link_list2.append(link_list[i])
+
+for i in range(len(title_list)):
+    title = title_list[i].getText()
+    link = link_list2[i].get('href')
+    linkTag = '<a href="https://www.kaat.jp' + link + '" rel="noopener" class="q_button rounded bt_red sz_s">オフィシャルサイト</a>'
+    if '～' in kikan_list[i].getText():
+        first = kikan_list[i].getText().split('～')[0].split('日時\n')[1]
+        last = kikan_list[i].getText().split('～')[1].split(')')[0] +')'
+    else:
+        first = kikan_list[i].getText().splitlines()[2]
+        last = ''
+    shortTitle = title_list[i].getText()
+    output_writer.writerow(['', title, 'KAAT神奈川芸術劇場', first, last, linkTag , link])
+
+
+
 """
 指定された日付が現在よりも過去かどうかを判定する関数
 """
