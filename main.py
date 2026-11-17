@@ -285,12 +285,6 @@ for i in range(len(title_list)):
 driver.quit()
 
 
-
-output_file.close()
-print('スクレイピング完了')
-print('output.csvに保存完了')
-
-
 #KAAT神奈川芸術劇場
 res = requests.get('https://www.kaat.jp/event/search')
 res.raise_for_status()
@@ -315,6 +309,14 @@ for i in range(len(title_list)):
         last = ''
     shortTitle = title_list[i].getText()
     output_writer.writerow(['', title, 'KAAT神奈川芸術劇場', first, last, linkTag , link])
+
+
+
+
+
+output_file.close()
+print('スクレイピング完了')
+print('output.csvに保存完了')
 
 
 
